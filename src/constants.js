@@ -22,8 +22,13 @@ const server = {
 }
 
 const atoms = {
-  room: {},
-  player: {}
+  room: {
+    name: "foo",
+    map: []
+  },
+  player: {
+    id: "uuid"
+  }
 }
 
 export { mainWindow, app, OSX, server, atoms }

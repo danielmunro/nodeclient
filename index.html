@@ -12,19 +12,36 @@
       import Client from './src/client'
       import State from './src/state'
       import { mainWindow, server } from './src/constants'
+
       const sprites = document.getElementById('sprites')
-      const renderer = new Renderer(sprites)
+
       const canvas = document.getElementById('app')
       canvas.height = mainWindow.HEIGHT
       canvas.width = mainWindow.WIDTH
+
+      const renderer = new Renderer(sprites)
       renderer.setContext(canvas.getContext('2d'))
-      let client = new Client(server.HOST, server.PORT, (data) => {
-        // do something with state update
-        renderer.stateChanged()
-      })
-      setTimeout(() => {
+      sprites.addEventListener('load', () => renderer.render())
+
+      const state = new State()
+
+      const client = new Client(
+        server.HOST,
+        server.PORT,
+        (data) => {
+          state.updateState(data.state)
+          renderer.stateChanged(state.atom)
+        }
+      )
+
+      const redrawTimeout = 5000
+
+      const redraw = () => {
         renderer.render()
-      }, 1000)
+        setTimeout(redraw, redrawTimeout)
+      }
+
+      setTimeout(redraw, redrawTimeout)
     </script>
   </body>
 </html>

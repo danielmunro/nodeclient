@@ -4,12 +4,14 @@ export class Renderer {
     this.isDirty = true
     this.isReady = false
     this.spritesheet.addEventListener('load', () => this.isReady = true)
+    this.atom = {}
   }
   setContext(context) {
     this.context = context
   }
-  stateChanged() {
+  stateChanged(atom) {
     this.isDirty = true
+    this.atom = { ...atom, ...this.atom }
   }
   render() {
     if (this.isReady && this.isDirty) {

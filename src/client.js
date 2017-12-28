@@ -27,9 +27,11 @@ export default class Client {
   }
   onData(data) {
     console.log('received: ' + data)
-    const newState = JSON.parse(data)
-    this.updateState(newState)
-    if (newState.fragment == 'room') {
+    const newData = JSON.parse(data)
+    if (newData.state) {
+      this.updateState(newData)
+    }
+    if (newData.fragment == 'room') {
       this.broadcastTestMessage()
     }
   }
