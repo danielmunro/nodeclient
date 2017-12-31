@@ -10,11 +10,15 @@ const app = {
   ACTIVATE: 'activate',
 }
 
+const room = {
+  TILE_SIZE_IN_PIXELS: 32,
+}
+
 const OSX = 'osx'
 
 const server = {
   HOST: 'localhost',
-  PORT: 6969,
+  PORT: 5151,
   events: {
     DATA: 'data',
     CLOSE: 'close',
@@ -31,4 +35,4 @@ const atoms = {
   }
 }
 
-export { mainWindow, app, OSX, server, atoms }
+export { mainWindow, app, OSX, server, atoms, room }

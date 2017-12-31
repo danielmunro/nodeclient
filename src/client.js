@@ -3,16 +3,21 @@ import { server } from './constants'
 
 export default class Client {
   constructor(host, port, updateState) {
-    this.socket = new net.Socket()
-    this.socket.connect(port, host, this.getRoom.bind(this))
-    this.socket.on(server.events.DATA, this.onData.bind(this))
-    this.socket.on(server.events.CLOSE, this.onClose.bind(this))
     this.updateState = updateState
+    this.ws = new WebSocket('ws://localhost:5151');
+    this.ws.onmessage = this.onMessage.bind(this)
+    this.ws.onopen = () => this.requestInitialState()
+  }
+  requestInitialState() {
+    console.log('requestInitialState')
+    this.getRoom()
+    this.getPlayer()
   }
   getRoom() {
-    this.send({
-      request: 'getRoom'
-    })
+    this.sendRequest('getRoom')
+  }
+  getPlayer() {
+    this.sendRequest('getPlayer')
   }
   broadcastTestMessage() {
     this.send({
@@ -20,23 +25,20 @@ export default class Client {
       message: 'test'
     })
   }
-  send(data) {
-    const s = JSON.stringify(data)
-    console.log('sending: '+s)
-    this.socket.write(s)
+  sendRequest(request) {
+    this.send({
+      request
+    })
   }
-  onData(data) {
-    console.log('received: ' + data)
-    const newData = JSON.parse(data)
-    if (newData.state) {
-      this.updateState(newData)
-    }
-    if (newData.fragment == 'room') {
-      this.broadcastTestMessage()
-    }
+  send(data) {
+    this.ws.send(JSON.stringify(data))
+  }
+  onMessage(message) {
+    console.log('received: ' + message)
+    this.updateState(JSON.parse(message.data))
   }
   onClose() {
     console.log('connection closed')
-    this.socket.close()
+    this.socket.destroy()
   }
 }

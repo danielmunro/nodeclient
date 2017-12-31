@@ -10,7 +10,7 @@
     <script type="application/javascript">
       import { Renderer } from './src/renderer'
       import Client from './src/client'
-      import State from './src/state'
+      import State, { Inspector } from './src/state'
       import { mainWindow, server } from './src/constants'
 
       const sprites = document.getElementById('sprites')
@@ -24,14 +24,18 @@
       sprites.addEventListener('load', () => renderer.render())
 
       const state = new State()
+      const inspector = new Inspector(state)
+      const onData = (data) => {
+        inspector.findMissingModels(data)
+        state.updateState(data)
+
+        renderer.stateChanged(state.atom)
+      }
 
       const client = new Client(
         server.HOST,
         server.PORT,
-        (data) => {
-          state.updateState(data.state)
-          renderer.stateChanged(state.atom)
-        }
+        onData
       )
 
       const redrawTimeout = 5000
