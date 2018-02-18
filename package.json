@@ -1,10 +1,11 @@
 {
-  "name": "electron-quick-start",
+  "name": "nodeclient",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "description": "A client",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "tsc && electron .",
+    "test": "jest"
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "keywords": [],
@@ -13,9 +14,12 @@
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.1",
-    "electron-prebuilt-compile": "^1.8.2-beta.3"
+    "electron": "1.8.2",
+    "electron-prebuilt-compile": "^1.8.2-beta.3",
+    "jest": "^22.0.4"
   },
   "dependencies": {
+    "typescript": "^2.7.2",
     "ws": "^3.3.3"
   }
 }

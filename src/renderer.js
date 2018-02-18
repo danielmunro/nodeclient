@@ -24,43 +24,37 @@ export class Renderer {
     this.atom = { ...transform(atom), ...this.atom }
   }
   render() {
-    console.log(this.atom)
-    if (this.isReady && this.isDirty && this.atom.room) {
-      console.log('render', this.atom)
+    if (this.isReadyToRender()) {
       const aroom = this.atom.room
-      const width = aroom.tiles[0].length, height = aroom.tiles.length
+      const width = aroom.tiles[0].length,
+              height = aroom.tiles.length
       for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
-          const srcX = aroom.tiles[y][x].x * room.TILE_SIZE_IN_PIXELS,
-            srcY = aroom.tiles[y][x].y * room.TILE_SIZE_IN_PIXELS
-          this.context.drawImage(
-            this.spritesheet,
-            srcX,
-            srcY,
-            room.TILE_SIZE_IN_PIXELS,
-            room.TILE_SIZE_IN_PIXELS,
-            x * room.TILE_SIZE_IN_PIXELS,
-            y * room.TILE_SIZE_IN_PIXELS,
-            room.TILE_SIZE_IN_PIXELS,
-            room.TILE_SIZE_IN_PIXELS
+          this.drawTileWithCoords(
+            aroom.tiles[y][x].x * room.TILE_SIZE_IN_PIXELS,
+            aroom.tiles[y][x].y * room.TILE_SIZE_IN_PIXELS,
+            x,
+            y
           )
         }
       }
-
-
-      // const srcX = 32, srcY = 32, destX = 0, destY = 0
-      // this.context.drawImage(
-      //   this.spritesheet,
-      //   srcX,
-      //   srcY,
-      //   room.TILE_SIZE_IN_PIXELS,
-      //   room.TILE_SIZE_IN_PIXELS,
-      //   destX,
-      //   destY,
-      //   room.TILE_SIZE_IN_PIXELS,
-      //   room.TILE_SIZE_IN_PIXELS
-      // )
       this.isDirty = false
     }
+  }
+  isReadyToRender() {
+    return this.isReady && this.isDirty && this.atom.room
+  }
+  drawTileWithCoords(srcX, srcY, destX, destY) {
+    this.context.drawImage(
+      this.spritesheet,
+      srcX,
+      srcY,
+      room.TILE_SIZE_IN_PIXELS,
+      room.TILE_SIZE_IN_PIXELS,
+      destX * room.TILE_SIZE_IN_PIXELS,
+      destY * room.TILE_SIZE_IN_PIXELS,
+      room.TILE_SIZE_IN_PIXELS,
+      room.TILE_SIZE_IN_PIXELS
+    )
   }
 }

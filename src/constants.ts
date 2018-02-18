@@ -19,20 +19,21 @@ const OSX = 'osx'
 const server = {
   HOST: 'localhost',
   PORT: 5151,
-  events: {
-    DATA: 'data',
-    CLOSE: 'close',
-  }
 }
 
 const atoms = {
   room: {
-    name: "foo",
-    map: []
+    name: 'foo',
+    //map: [],
   },
   player: {
-    id: "uuid"
+    id: 'uuid'
   }
 }
 
-export { mainWindow, app, OSX, server, atoms, room }
+const wsEvents = {
+  OPEN: 'open',
+  MESSAGE: 'message'
+}
+
+export { mainWindow, app, OSX, server, atoms, room, wsEvents }

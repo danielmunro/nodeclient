@@ -4,48 +4,39 @@
     <meta charset="UTF-8">
     <title>Hello World!</title>
   </head>
-  <body style="margin: 0px; padding: 0px;">
-    <img src="./sprites.png" style="display: none;" id="sprites" />
-    <canvas id="app"></canvas>
-    <script type="application/javascript">
-      import { Renderer } from './src/renderer'
-      import Client from './src/client'
-      import State, { Inspector } from './src/state'
-      import { mainWindow, server } from './src/constants'
+  <body style="margin: 0px; padding: 0px; height: 100%;">
+    <div id="webconsole" style="width: 100%;">
 
-      const sprites = document.getElementById('sprites')
-
-      const canvas = document.getElementById('app')
-      canvas.height = mainWindow.HEIGHT
-      canvas.width = mainWindow.WIDTH
-
-      const renderer = new Renderer(sprites)
-      renderer.setContext(canvas.getContext('2d'))
-      sprites.addEventListener('load', () => renderer.render())
-
-      const state = new State()
-      const inspector = new Inspector(state)
-      const onData = (data) => {
-        inspector.findMissingModels(data)
-        state.updateState(data)
-
-        renderer.stateChanged(state.atom)
-      }
-
-      const client = new Client(
-        server.HOST,
-        server.PORT,
-        onData
-      )
-
-      const redrawTimeout = 5000
-
-      const redraw = () => {
-        renderer.render()
-        setTimeout(redraw, redrawTimeout)
-      }
-
-      setTimeout(redraw, redrawTimeout)
-    </script>
+    </div>
+    <div style="width: 100%; position: absolute; bottom: 0px;">
+      <input type="text" style="width: 100%;" id="input" />
+    </div>
   </body>
+  <script type="application/javascript">
+    import Client from './src/client'
+    import { server } from './src/constants'
+    const webconsole = document.getElementById("webconsole")
+    const client = new Client(
+      server.HOST,
+      server.PORT,
+      (message) => {
+        webconsole.innerHTML += '<p>' + message + '</p>'
+        const remaining = 10000 - webconsole.innerHTML.length
+        if (remaining < 0) {
+          webconsole.innerHTML = webconsole.innerHTML.substring(
+            Math.abs(remaining)
+          )
+        }
+      }
+    )
+
+    const inputElement = document.getElementById('input')
+
+    inputElement.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        client.addInputFromUser(inputElement.value)
+        inputElement.select()
+      }
+    })
+  </script>
 </html>
