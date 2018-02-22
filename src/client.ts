@@ -11,13 +11,7 @@ export default class Client {
     this.ws.addEventListener(wsEvents.OPEN, () => this.requestInitialState())
   }
   requestInitialState() {
-    this.send({ request: 'look' })
-  }
-  getRoom() {
-    this.getNode('room', 'prairieant-mistress')
-  }
-  getPlayer() {
-    this.getNode('player', 'peppermintowl-spear')
+    this.request('look')
   }
   getNode(label: string, name: string) {
     this.send({ request: 'node', label, name })
@@ -28,13 +22,15 @@ export default class Client {
   addInputFromUser(input: string) {
     // this.send({ request: 'input', input })
     // hack all input as social in order to dev/test
-    this.social('gossip', input)
+    this.request(input)
+  }
+  private request(request: string) {
+    this.send({ request })
   }
   send(data: object) {
     this.ws.send(JSON.stringify(data))
   }
   onMessage(message: any) {
-    console.log(message.data)
     const data = JSON.parse(message.data)
     if (data.room) {
       const r = data.room
@@ -42,11 +38,12 @@ export default class Client {
         "<p>" + r.brief + "</p><p>" + r.description + "</p><p>Exits: [" + ["north", "south", "east", "west", "up", "down"].map((direction) => 
           r[direction] ? direction.substr(0, 1) : "").join("") + "]</p>"
       )
+      return
     }
-    //this.mainLog(message.data)
-    //if (data.)
-    //this.updateState(data)
 
+    if (data.message) {
+      this.mainLog("<p>" + data.message + "</p>")
+    }
   }
   onClose() {
     this.ws.close()
