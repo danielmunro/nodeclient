@@ -1,8 +1,14 @@
+import * as nl2br from 'nl2br'
 import { server, wsEvents } from './constants'
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1)
+}
 
 export default class Client {
   private readonly ws: WebSocket
   private readonly mainLog: (message: string) => {}
+  private player
 
   constructor(host: string, port: number, mainLog: (message: string) => {}) {
     this.ws = new WebSocket('ws://' + host + ':' + port)
@@ -11,7 +17,7 @@ export default class Client {
     this.ws.addEventListener(wsEvents.OPEN, () => this.requestInitialState())
   }
   requestInitialState() {
-    this.request('look')
+    //this.request('look')
   }
   getNode(label: string, name: string) {
     this.send({ request: 'node', label, name })
@@ -32,17 +38,42 @@ export default class Client {
   }
   onMessage(message: any) {
     const data = JSON.parse(message.data)
+    console.log(data)
     if (data.room) {
       const r = data.room
       this.mainLog(
-        "<p>" + r.brief + "</p><p>" + r.description + "</p><p>Exits: [" + ["north", "south", "east", "west", "up", "down"].map((direction) => 
-          r[direction] ? direction.substr(0, 1) : "").join("") + "]</p>"
+        "<p>" + r.name + "</p><p>" + r.description + "</p><p>Exits: [" + ["north", "south", "east", "west", "up", "down"].map((direction) => 
+          r.exits.find((exit) => exit.direction === direction) ? direction.substr(0, 1) : "").join("") + "]</p>"
+          + r.inventory.items.map((item) => item.name + " is here.<br />").join("")
+          + (r.inventory.items.length > 0 ? "<br />" : "")
+          + r.mobs.filter((mob) => mob.name !== this.player.sessionMob.name).map((mob) => capitalizeFirstLetter(mob.name) + " is here.<br />").join("")
       )
       return
     }
 
+    if (data.inventory) {
+      const i = data.inventory
+      this.mainLog(
+        "<p>Your inventory:</p>" + i.items.map((item) => "<p>" + item.name + "</p>").join("")
+      )
+      return
+    }
+
+    if (data.mob || data.item) {
+      const thing = data.mob ? data.mob : data.item
+      this.mainLog(
+        "<p>" + thing.description + "</p>"
+      )
+      return
+    }
+
+    if (data.player) {
+      this.player = data.player
+      return
+    }
+
     if (data.message) {
-      this.mainLog("<p>" + data.message + "</p>")
+      this.mainLog("<p>" + nl2br(data.message) + "</p>")
     }
   }
   onClose() {

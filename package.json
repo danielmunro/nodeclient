@@ -19,6 +19,7 @@
     "jest": "^22.0.4"
   },
   "dependencies": {
+    "nl2br": "^0.0.3",
     "typescript": "^2.7.2",
     "ws": "^3.3.3"
   }
